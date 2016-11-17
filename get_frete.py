@@ -9,8 +9,8 @@ str_request='http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?nCdEmpresa
 
 
 
-codigoEmpresa='14145790'
-senha='68972741'
+codigoEmpresa=''
+senha=''
 cepOrigem='05866000'
 cepDestino='04018000'
 peso='0.500'
