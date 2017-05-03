@@ -5,165 +5,152 @@ from bs4 import BeautifulSoup as bs
 import timeit
 import json
 
-str_request='http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?nCdEmpresa=#codigo_empresa#&sDsSenha=#senha#&nCdServico=#codigo_servico#&sCepOrigem=#cep_origem#&sCepDestino=#cep_destino#&nVlPeso=#peso#&nCdFormato=1&nVlComprimento=#comprimento#&nVlLargura=#largura#&nVlAltura=#altura#&nVlDiametro=0&sCdMaoPropria=#mao_propria#&nVlValorDeclarado=#valor_declarado#&sCdAvisoRecebimento=#aviso_recebimento#&StrRetorno=XML'
+class bcolors:
+    HEADER    = '\033[95m'
+    OKBLUE    = '\033[94m'
+    OKGREEN   = '\033[92m'
+    WARNING   = '\033[93m'
+    FAIL      = '\033[91m'
+    ENDC      = '\033[0m'
+    BOLD      = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 
+class Pedido(object):
 
-codigoEmpresa=''
-senha=''
-cepOrigem='05866000'
-cepDestino='04018000'
-peso='0.500'
-altura='30'
-largura='17'
-comprimento='16'
-avisoRecebimento='N'
-entregaMaoPropria='N'
-valorDeclarado='0'
+	def __init__(
+			self,
+	 		cep_origem,
+	 		cep_destino,
+	 		peso,
+	 		altura,
+	 		largura,
+	 		comprimento
+		):
 
-
-# Código dos correios:
-#PAC: 41106
-#SEDEX: 40010
-#Função build_str_request recebe a String com a url de requisição;
-#A variavel new_str_request recebe atraves da função sub do regex os valores dos parametros
-#É retornado o valor da nova String com os parametros inseridos
-def build_str_request_pac(str_request):
-       
-       new_str_request=re.sub('#codigo_servico#','41106', str_request)
-       new_str_request=re.sub('#codigo_empresa#',codigoEmpresa, new_str_request)
-       new_str_request=re.sub('#senha#',senha, new_str_request)
-       new_str_request = re.sub('#cep_origem#', cepOrigem, new_str_request)
-       new_str_request = re.sub('#cep_destino#',cepDestino , new_str_request)
-       new_str_request = re.sub('#peso#', peso, new_str_request)
-       new_str_request = re.sub('#altura#', altura, new_str_request)
-       new_str_request = re.sub('#largura#', largura, new_str_request)
-       new_str_request = re.sub('#comprimento#', comprimento, new_str_request)
-       new_str_request=re.sub('#aviso_recebimento#', avisoRecebimento, new_str_request)
-       new_str_request=re.sub('#mao_propria#', entregaMaoPropria, new_str_request)
-       new_str_request=re.sub('#valor_declarado#', valorDeclarado, new_str_request)
-
-       return new_str_request
-
-def build_str_request_sedex(str_request):
-       
-       new_str_request=re.sub('#codigo_servico#','40010', str_request)
-       new_str_request=re.sub('#codigo_empresa#',codigoEmpresa, new_str_request)
-       new_str_request=re.sub('#senha#',senha, new_str_request)
-       new_str_request = re.sub('#cep_origem#', cepOrigem, new_str_request)
-       new_str_request = re.sub('#cep_destino#',cepDestino , new_str_request)
-       new_str_request = re.sub('#peso#', peso, new_str_request)
-       new_str_request = re.sub('#altura#', altura, new_str_request)
-       new_str_request = re.sub('#largura#', largura, new_str_request)
-       new_str_request = re.sub('#comprimento#', comprimento, new_str_request)
-       new_str_request=re.sub('#aviso_recebimento#', avisoRecebimento, new_str_request)
-       new_str_request=re.sub('#mao_propria#', entregaMaoPropria, new_str_request)
-       new_str_request=re.sub('#valor_declarado#', valorDeclarado, new_str_request)
-
-       return new_str_request
-
-def build_str_request_e_sedex(str_request):
-       
-       new_str_request=re.sub('#codigo_servico#','81019', str_request)
-       new_str_request=re.sub('#codigo_empresa#',codigoEmpresa, new_str_request)
-       new_str_request=re.sub('#senha#',senha, new_str_request)
-       new_str_request = re.sub('#cep_origem#', cepOrigem, new_str_request)
-       new_str_request = re.sub('#cep_destino#',cepDestino , new_str_request)
-       new_str_request = re.sub('#peso#', peso, new_str_request)
-       new_str_request = re.sub('#altura#', altura, new_str_request)
-       new_str_request = re.sub('#largura#', largura, new_str_request)
-       new_str_request = re.sub('#comprimento#', comprimento, new_str_request)
-       new_str_request=re.sub('#aviso_recebimento#', avisoRecebimento, new_str_request)
-       new_str_request=re.sub('#mao_propria#', entregaMaoPropria, new_str_request)
-       new_str_request=re.sub('#valor_declarado#', valorDeclarado, new_str_request)
-
-       return new_str_request
-
-
-
-pac=build_str_request_pac(str_request)
+		self.cep_origem  = cep_origem
+		self.cep_destino = cep_destino
+		self.peso        = peso
+		self.altura      = altura
+		self.largura     = largura
+		self.comprimento = comprimento
 
 
 
 
+class Cotacao_frete(object):
+
+	def __init__(
+		self                ,
+		codigo_servico      ,
+		codigo_empresa      ,
+		senha               ,
+		valor_declarado     ,
+		aviso_recebimento   ,
+		entrega_mao_propria ,
+		pedido
+	):
+		self.codigo_servico      = codigo_servico
+		self.codigo_empresa      = codigo_empresa
+		self.senha 			     = senha
+		self.valor_declarado     = valor_declarado
+		self.aviso_recebimento   = aviso_recebimento
+		self.entrega_mao_propria = entrega_mao_propria
+		self.pedido				 = pedido 
+		self.lista_retorno       = {}
+
+	def realiza_cotacao(self):
+		endpoint_url = 'http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx'
+		params = {
+			"nCdEmpresa"          : self.codigo_empresa      ,
+			"sDsSenha"            : self.senha               ,
+			"nCdServico"          : self.codigo_servico,
+			"sCepOrigem"          : self.pedido.cep_origem   ,
+			"sCepDestino"         : self.pedido.cep_destino  ,
+			"nVlPeso"             : self.pedido.peso         ,
+			"nCdFormato"          : 1,
+			"nVlComprimento"      : self.pedido.comprimento  ,
+			"nVlLargura"          : self.pedido.largura      ,
+			"nVlAltura"           : self.pedido.altura       ,
+			"nVlDiametro"         : 0,
+			"sCdMaoPropria"       : self.entrega_mao_propria ,
+			"nVlValorDeclarado"   : self.valor_declarado     ,
+			"sCdAvisoRecebimento" : self.aviso_recebimento   ,
+			"StrRetorno"          : "XML"
+		}
 
 
+		response    = requests.get(endpoint_url, params = params)
+		xml_content = bs(response.content, "xml")
 
-sedex=build_str_request_sedex(str_request)
+		if  xml_content.Valor.string is None:
+			self.lista_retorno['valor'] = '0.00'
+		else:
+			self.lista_retorno['valor'] = xml_content.Valor.string
 
-e_sedex=build_str_request_e_sedex(str_request)
+		if xml_content.PrazoEntrega.string is None:
+			self.lista_retorno['prazo_entrega'] = '0'	
+		else:
+			self.lista_retorno['prazo_entrega'] = xml_content.PrazoEntrega.string	
 
-response=requests.get(pac)
-
-pac=str(response.content)
-response=requests.get(sedex)
-sedex=str(response.content)
-response=requests.get(e_sedex)
-e_sedex=str(response.content)
-
-xml_content1=bs(pac,"xml")
-valor=xml_content1.Valor
-prazoEntrega=xml_content1.PrazoEntrega
-msgErro=xml_content1.MsgErro
-
-
-xml_content2=bs(sedex, "xml")
-valor_sedex=xml_content2.Valor
-prazoEntrega_sedex=xml_content2.PrazoEntrega
-msgErro_sedex=xml_content2.MsgErro
-
-xml_content3=bs(e_sedex, "xml")
-valor_e_sedex=xml_content3.Valor
-prazoEntrega_e_sedex=xml_content3.PrazoEntrega
-msgErro_e_sedex=xml_content3.MsgErro
-
-try:
-  print 'PAC: '+valor.string+'  Prazo de Entrega: '+prazoEntrega.string+' dia(s)'
-except AttributeError:
-    print 'TesteS'
-
-try:
-    print 'Mensagem: '+msgErro.string
-except TypeError:
-    print ''     
-
-print '\n'
-
-try:
-  print 'SEDEX: '+valor_sedex.string+'  Prazo de Entrega: '+prazoEntrega_sedex.string+' dia(s)'
-except TypeError:
-    print 'Erro'
-
-try:
-    print 'Mensagem: '+msgErro_sedex.string
-except TypeError:
-    print '' 
-
-print '\n'
-
-try:
-  if codigoEmpresa=='':
-    pass
-  else:
-
-    print "E-SEDEX: "+ valor_e_sedex.string+' Prazo de Entrega: '+prazoEntrega_e_sedex.string
-except TypeError:
-  print 'Erro - verifique o xml'
-
-try:
-  if codigoEmpresa=='':
-    print "Sem contratos para E-sedex"
-  else: 
-    print "Mensagem: "+msgErro_e_sedex.string  
-except TypeError:
-  print '' 
+		# import ipdb; ipdb.set_trace()
+		if  xml_content.MsgErro.string is None:
+			self.lista_retorno['msgErro'] = '...'
+		else:
+			self.lista_retorno['msgErro'] = xml_content.MsgErro.string
+	
+			 
+		return self.lista_retorno
 
 
 
 
+if __name__ == "__main__":
+	bcolors = bcolors()
+	pedido  = Pedido(
+	 		cep_origem  = '44052056' ,
+	 		cep_destino = '22793104' ,
+	 		peso        = '0.5'      ,
+	 		altura      = '2'        ,
+	 		largura     = '11'       ,
+	 		comprimento = '16'       ,
 
-print xml_content3
+		)
+
+	pac    = Cotacao_frete(								# Código dos correios:
+				codigo_servico      = '04669'    ,      # PAC   : 41106
+				codigo_empresa      = '73047929' ,      # SEDEX : 40010
+				senha               = '23721605' , 
+				valor_declarado     = '100'        ,
+				aviso_recebimento   = 'N'        ,
+				entrega_mao_propria = 'N'        ,
+				pedido              = pedido
+			)
+
+	sedex    = Cotacao_frete(
+				codigo_servico      = '04162'    ,
+				codigo_empresa      = '73047929' ,
+				senha               = '23721605' , 
+				valor_declarado     = '0'        ,
+				aviso_recebimento   = 'N'        ,
+				entrega_mao_propria = 'N'        ,
+				pedido              = pedido
+			)
+
+
+	lista_pac = pac.realiza_cotacao()
+	# import ipdb; ipdb.set_trace()
+
+	lista_sedex = sedex.realiza_cotacao()
+	
+
+	print '====================================================================='
+	print bcolors.BOLD +'PAC: ' + bcolors.ENDC + lista_pac['valor'] + '  prazo de Entrega: ' + lista_pac['prazo_entrega'] + ' dias(s)'
+	print bcolors.BOLD + bcolors.WARNING + 'Mensagem: ' +bcolors.ENDC + lista_pac['msgErro'] 
+	print '====================================================================='
+	print bcolors.BOLD +'SEDEX: '+bcolors.ENDC + lista_sedex['valor'] + '  prazo de Entrega: ' + lista_sedex['prazo_entrega'] + ' dias(s)'
+	print bcolors.BOLD + bcolors.WARNING + 'Mensagem: ' + bcolors.ENDC + lista_sedex['msgErro'] 
+	print '====================================================================='
 
 
 
-print e_sedex
